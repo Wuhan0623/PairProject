@@ -17,7 +17,7 @@ type loginParam struct {
 
 type userLikeParam struct {
 	Username string `json:"username" binding:"required"`
-	ThesisID string `json:"thesis_id" binding:"required"`
+	ThesisID int `json:"thesis_id" binding:"required"`
 }
 
 type showUserLikeParam struct {
@@ -80,18 +80,18 @@ func UserLikeAdd(c *gin.Context) {
 	thesisID := param.ThesisID
 
 	//先判断用户和论文是否都存在
-	user, _ := database.DB.Raw("select * from user where username = ? ", username).Rows()
+	user, _ := database.DB.Raw("select * from user where username = ? ;", username).Rows()
 	var i int
 	if user.Next() {
 		i++
 	}
-	thesis, _ := database.DB.Raw("select * from analyzed_thesis where ID = ? ", thesisID).Rows()
+	thesis, _ := database.DB.Raw("select * from analyzed_thesis where ID = ? ;", thesisID).Rows()
 	var j int
 	if thesis.Next() {
 		j++
 	}
 	//判断该用户是否已收藏该文章
-	rows, _ := database.DB.Raw("select * from user_like where username = ? and thesis_id = ? ", username, thesisID).Rows()
+	rows, _ := database.DB.Raw("select * from user_like where username = ? and thesis_id = ? ;", username, thesisID).Rows()
 	var k int
 	if rows.Next() {
 		k++
@@ -166,7 +166,7 @@ func UserLikeShow(c *gin.Context) {
 	}
 
 	//根据收藏ID数组查找论文
-	rows, _ := database.DB.Raw("select * from analyzed_thesis where ID in ?", thesisIdArr).Rows()
+
 	var ID int
 	var Source string
 	var Year int
@@ -176,9 +176,9 @@ func UserLikeShow(c *gin.Context) {
 	var Abstract string
 	var Link string
 	var thesisArr []thesisSearch.AnalyzedThesis
-	for rows.Next() {
+	for _, eachID := range thesisIdArr {
+		database.DB.Raw("select * from analyzed_thesis where ID = ? ;", eachID).Row().Scan(&ID, &Source, &Year, &Title, &Author, &Keyword, &Abstract, &Link)
 		temp := thesisSearch.AnalyzedThesis{}
-		_ = rows.Scan(&ID, &Source, &Year, &Title, &Author, &Keyword, &Abstract)
 		temp.ID = ID
 		temp.Source = Source
 		temp.Year = Year

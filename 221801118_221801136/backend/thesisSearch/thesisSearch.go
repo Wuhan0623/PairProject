@@ -28,7 +28,7 @@ type thesisSearchParam struct {
 func GetThesisList(c *gin.Context) {
 	param := thesisSearchParam{}
 	_ = c.ShouldBindJSON(&param)
-	
+
 	keyword := param.Keyword
 	page := param.Page
 
@@ -77,6 +77,7 @@ func GetThesisList(c *gin.Context) {
 
 		//Keys = append(Keys, Keyword)
 	}
+
 	//c.JSON(http.StatusOK, Keys)
 	c.JSON(http.StatusOK, thesisArr)
 }
